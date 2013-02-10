@@ -10,12 +10,16 @@ class MapWKT::Map
   end
   
   def center_point
-    @center_point
+    @center_point ||= case (obj = self.overlays.first)
+      when MapWKT::Point then obj
+      when MapWKT::LineString, MapWKT::MultiPoint then obj.first
+      when MapWKT::Polygon then obj.shell.first
+    end
   end
   
   def center_point= (*args)
     return if args.none?
-    @center_point = Point.new(*args)
+    @center_point = MapWKT::Point.new(*args)
   end
   
   def element_id
@@ -36,20 +40,34 @@ class MapWKT::Map
     self.element_id = element_id
   end
   
-  def initialize (map_options = {})
-    self.options = map_options
+  def initialize (*args)
+    @overlays = []
+    
+    self.options = case (arg = args.first)
+      when Hash then arg
+      when String then { element_id: arg }
+      else {}
+    end
   end
   
-  def js_function (map_options = {})
-    self.options = map_options
+  def js_output (*args)
+    self.options = case (arg = args.first)
+      when Hash then arg
+      when String then { element_id: arg }
+      else {}
+    end
     
-<<-JAVASCRIPT
+    raise(ArgumentError, "element_id is required") unless self.element_id
+    raise(ArgumentError, "center_point is required") unless self.center_point
+    
+<<-JAVASCRIPT.gsub('new google.maps.LatLng','new p')
 var mapwkt_#{self.object_id}_initialize = function ()
 {
   var p = google.maps.LatLng
   var element = document.getElementById(#{self.element_id.to_json})
-  var options = { center: #{self.center.to_json}, mapTypeId: google.maps.MapTypeId.#{self.mapTypeId}, zoom: #{self.zoom} }
+  var options = { center: #{self.center.js_fragment}, mapTypeId: google.maps.MapTypeId.#{self.mapTypeId}, zoom: #{self.zoom} }
   var map = new google.maps.Map(element, options)
+  #{self.overlays.map {|obj| obj.js_output('map', indent = 2) }.join("\n  ")}
 }
 JAVASCRIPT
   end
@@ -100,6 +118,10 @@ JAVASCRIPT
     self.zoom_level = map_options[:zoom_level] || map_options[:zoom] || self.zoom_level || 10
   end
   
+  def overlays
+    @overlays
+  end
+  
   def type
     self.map_type
   end
@@ -123,5 +145,20 @@ JAVASCRIPT
   def zoom_level= (zoom_level)
     return unless zoom_level
     @zoom_level = [0,[zoom_level.to_i, 18].min].max
+  end
+  
+  def << (overlay_obj)
+    case overlay_obj
+      when MapWKT::LineString, MapWKT::MultiLineString, MapWKT::MultiPoint, MapWKT::MultiPolygon, MapWKT::Point, MapWKT::Polygon
+        self.overlays << overlay_obj
+      
+      when String
+        self.overlays << MapWKT.parse(overlay_obj)
+      
+    else
+      MapWKT.parse(overlay_obj.wkt)
+    end
+    
+    self
   end
 end
