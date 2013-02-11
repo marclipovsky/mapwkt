@@ -7,29 +7,33 @@ class MapWKT::Geometry
     
     case s
       when /^POINT\(([\d\s.-]*?)\)$/
-        x, y = self.parse_x_y $~[1]
+        x, y = self.parse_x_y $1
         [MapWKT::Geometry::Point.new(y,x)]
       
       when /^LINESTRING\(([\d\s,.-]*?)\)$/
-        points = self.parse_points $~[1]
+        points = self.parse_points $1
         [MapWKT::Geometry::LineString.new(*points)]
       
       when /^POLYGON\((\([\d\s,.-]*?\)(?:,\([\d\s,.-]*?\))*)\)$/
-        perimeter, lacunae = self.parse_linestrings $~[1]
+        perimeter, lacunae = self.parse_linestrings $1
         [MapWKT::Geometry::Polygon.new(perimeter, *lacunae)]
       
       when /^MULTIPOINT\(([\d\s,.-]*?)\)$/
-        self.parse_points $~[1]
+        self.parse_points $1
       
       when /^MULTIPOINT\((\([\d\s,.-]*?\)(?:,\([\d\s,.-]*?\))*)\)$/
-        points_string = $~[1].gsub(/[()]/,'')
+        points_string = $1.gsub(/[()]/,'')
         self.parse_points(points_string)
       
       when /^MULTILINESTRING\((\([\d\s,.-]*?\)(?:,\([\d\s,.-]*?\))*)\)$/
-        self.parse_linestrings $~[1]
+        self.parse_linestrings $1
       
       when /^MULTIPOLYGON\((\(\([\d\s,.-]*?\)(?:,\([\d\s,.-]*?\))*\)(?:,\(\([\d\s,.-]*?\)(?:,\([\d\s,.-]*?\))*\))*)\)$/
-        self.parse_polygons $~[1]
+        self.parse_polygons $1
+      
+      when /^GEOMETRYCOLLECTION\((.*?)\)$/
+        wkt_strings = $1.scan(/([A-Z]+\(.*?\))(?=,[A-Z]|$)/).flatten
+        wkt_strings.map {|wkt_string| self.parse_wkt(wkt_string) }.flatten
       
     else
       raise SyntaxError
