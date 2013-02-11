@@ -1,17 +1,44 @@
 # encoding: UTF-8
 
+Geometry = Class.new
+Map = Class.new
+Overlay = Class.new
+
+LineString = Class.new(Geometry)
+Point = Class.new(Geometry)
+Polygon = Class.new(Geometry)
+
+Marker = Class.new(Overlay)
+PolygonOverlay = Class.new(Overlay)
+Polyline = Class.new(Overlay)
+
+# Register the class names in the top-level namespace.
+[
+  Geometry, LineString, Map, Marker, Overlay,
+  Point, Polygon, PolygonOverlay, Polyline
+].map(&:name)
+
+# Create the namespaced constants pointing to the classes.
 module MapWKT
-  require 'bundler/setup'
-  require 'active_support/all'
+  Geometry = ::Geometry
+  Map = ::Map
+  Overlay = ::Overlay
   
-  require_relative 'mapwkt/gmap/overlay'
-  require_relative 'mapwkt/gmap/map'
-  require_relative 'mapwkt/gmap/marker'
-  require_relative 'mapwkt/gmap/polygon'
-  require_relative 'mapwkt/gmap/polyline'
+  class Geometry
+    LineString = ::LineString
+    Point = ::Point
+    Polygon = ::Polygon
+  end
   
-  require_relative 'mapwkt/wkt/geometry'
-  require_relative 'mapwkt/wkt/line_string'
-  require_relative 'mapwkt/wkt/point'
-  require_relative 'mapwkt/wkt/polygon'
+  class Overlay
+    Marker = ::Marker
+    Polygon = ::PolygonOverlay
+    Polyline = ::Polyline
+  end
+  
+  require_relative 'mapwkt-safe'
 end
+
+def Point (*args) Point.new(*args) end
+def LineString (*args) LineString.new(*args) end
+def Polygon (*args) Polygon.new(*args) end

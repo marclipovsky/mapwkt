@@ -3,7 +3,7 @@
 class MapWKT::Geometry
   def self.parse_wkt (wkt_string)
     # Remove extraneous whitespace.
-    s = wkt_string.to_s.upcase.strip.gsub(/\s*([),(])\s*/,'\1')
+    s = wkt_string.to_s.upcase.strip.gsub(/\s*([),(])\s*/,'\1').gsub(/\s+/,' ')
     
     case s
       when /^POINT\(([\d\s.-]*?)\)$/

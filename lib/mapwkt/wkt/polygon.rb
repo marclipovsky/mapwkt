@@ -1,6 +1,11 @@
 # encoding: UTF-8
 
-class MapWKT::Geometry::Polygon
+class MapWKT::Geometry::Polygon < MapWKT::Geometry
+  # Returns a Point midway between the N/S- & E/W-most Points in the perimeter.
+  def center
+    self.perimeter.center
+  end
+  
   # Returns a new MapWKT::Geometry::Polygon with the given outer perimeter and
   # internal lacunae. If the given LineStrings were unclosed, closes them for
   # use in the Polygon, but leaves the original LineStrings unchanged.

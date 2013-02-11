@@ -1,6 +1,11 @@
 # encoding: UTF-8
 
-class MapWKT::Geometry::Point
+class MapWKT::Geometry::Point < MapWKT::Geometry
+  # Returns a new Point with the same latitude and longitude as this Point.
+  def center
+    self.dup
+  end
+  
   # Returns true if this Point lies in the eastern hemisphere, false otherwise.
   def east?
     self.longitude > 0

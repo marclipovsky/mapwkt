@@ -1,6 +1,24 @@
 # encoding: UTF-8
 
-class MapWKT::Geometry::LineString
+class MapWKT::Geometry::LineString < MapWKT::Geometry
+  # Returns a Point midway between the N/S- & E/W-most Points in the LineString.
+  def center
+    return if self.points.empty?
+    n, s, e, w = nil
+    
+    self.points.each do |p|
+      n = p.y if !n || p.y > n
+      s = p.y if !s || p.y < s
+      e = p.x if !e || p.x > e
+      w = p.x if !w || p.x < w
+    end
+    
+    x = (e + w) / 2
+    y = (n + s) / 2
+    
+    Point.new(y, x)
+  end
+  
   # Returns this LineString after closing its endpoints.
   def close!
     self.refresh! unless @refreshed
