@@ -35,7 +35,7 @@ class MapWKT::Geometry::LineString < MapWKT::Geometry
   # Returns a new LineString with the same geographic Points as this LineString.
   def dup
     points = self.points.map(&:dup)
-    LineString(*points).tap {|ls| ls.close! if self.closed? }
+    LineString.new(*points).tap {|ls| ls.close! if self.closed? }
   end
   
   # Returns a new LineString containing the given Points.
