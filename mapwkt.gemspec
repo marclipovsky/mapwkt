@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name = "mapwkt"
-  s.version = "1.0.0"
-  s.authors = ["Jesse Sielaff"]
+  s.version = "1.0.1"
+  s.authors = ["Jesse Sielaff", "Marc Lipovsky"]
   s.email = "jesse.sielaff@gmail.com"
   s.summary = "An object library for converting Ruby objects with WKT to JavaScript for Google Maps."
   s.description = "."
