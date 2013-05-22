@@ -58,16 +58,16 @@ class MapWKT::Map
     
     raise(ArgumentError, "HMTL id is required") unless self.id
     
-<<-JAVASCRIPT.gsub('new google.maps.LatLng','new p')
-function mapwkt_#{self.object_id}_initialize ()
-{
-  var p = google.maps.LatLng
-  var element = document.getElementById('#{self.id}')
-  var options = { center: new google.maps.LatLng(#{self.center.latitude_f},#{self.center.longitude_f}), mapTypeId: google.maps.MapTypeId.#{self.map_type_id}, zoom: #{self.zoom} }
-  var map = new google.maps.Map(element, options)
-  #{self.overlays.map {|obj| obj.js_output('map') }.join("\n  ")}
-}
-JAVASCRIPT
+    <<-JAVASCRIPT.gsub('new google.maps.LatLng','new p')
+    function mapwkt_#{self.object_id}_initialize ()
+    {
+      #{self.options[:point] || 'point'} = google.maps.LatLng
+      #{self.options[:element] || 'element'} = document.getElementById('#{self.id}')
+      #{self.options[:options] || 'options'} = { center: new google.maps.LatLng(#{self.center.latitude_f},#{self.center.longitude_f}), mapTypeId: google.maps.MapTypeId.#{self.map_type_id}, zoom: #{self.zoom} }
+      #{self.options[:map] || 'map'} = new google.maps.Map(element, options)
+      #{self.overlays.map {|obj| obj.js_output('map') }.join("\n  ")}
+    }
+    JAVASCRIPT
   end
   
   def map_type_id
