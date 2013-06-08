@@ -59,8 +59,6 @@ class MapWKT::Map
     raise(ArgumentError, "HMTL id is required") unless self.id
     
 <<-JAVASCRIPT.gsub('new google.maps.LatLng','new p')
-var options
-var map
 function mapwkt_#{self.object_id}_initialize ()
 {
   var p = google.maps.LatLng
