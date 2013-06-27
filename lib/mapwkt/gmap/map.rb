@@ -120,7 +120,7 @@ JAVASCRIPT
   
   def << (obj)
     overlays = case obj
-      when MapWKT::Geometry then [MapWKT::Overlay.new(obj, obj)]
+      # when MapWKT::Geometry then [MapWKT::Overlay.new(obj, obj)]
       when MapWKT::Overlay then [obj]
     else
       raise(TypeError, "method `wkt' is not defined for #{obj.inspect}") unless obj.respond_to?(:wkt)
