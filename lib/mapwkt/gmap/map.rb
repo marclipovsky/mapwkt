@@ -63,7 +63,11 @@ function mapwkt_#{self.object_id}_initialize ()
 {
   var p = google.maps.LatLng
   var element = document.getElementById('#{self.id}')
-  options = { center: new google.maps.LatLng(#{self.center.latitude_f},#{self.center.longitude_f}), mapTypeId: google.maps.MapTypeId.#{self.map_type_id}, zoom: #{self.zoom} }
+  options = {
+    #{"center: new google.maps.LatLng(#{self.center.latitude_f},#{self.center.longitude_f})," if self.center}
+    mapTypeId: google.maps.MapTypeId.#{self.map_type_id},
+    zoom: #{self.zoom}
+  }
   map = new google.maps.Map(element, options)
   #{self.overlays.map {|obj| obj.js_output('map') }.join("\n  ")}
 }
