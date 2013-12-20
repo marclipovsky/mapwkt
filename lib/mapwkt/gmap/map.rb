@@ -59,18 +59,15 @@ class MapWKT::Map
     raise(ArgumentError, "HMTL id is required") unless self.id
     
 <<-JAVASCRIPT.gsub('new google.maps.LatLng','new p')
-function mapwkt_#{self.object_id}_initialize ()
-{
   var p = google.maps.LatLng
   var element = document.getElementById('#{self.id}')
-  options = {
+  var options = {
     #{"center: new google.maps.LatLng(#{self.center.latitude_f},#{self.center.longitude_f})," if self.center}
     mapTypeId: google.maps.MapTypeId.#{self.map_type_id},
     zoom: #{self.zoom}
   }
-  map = new google.maps.Map(element, options)
+  var map = new google.maps.Map(element, options)
   #{self.overlays.map {|obj| obj.js_output('map') }.join("\n  ")}
-}
 JAVASCRIPT
   end
   
